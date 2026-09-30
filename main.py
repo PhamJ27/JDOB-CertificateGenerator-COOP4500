@@ -15,6 +15,10 @@ from docx.text.paragraph import Paragraph
 from docx.oxml.ns import qn
 import time
 
+
+Template    = 'AwardTemplate2019-2020.docx'
+SpreadSheet = 'Processed_Report1-Revised.csv'
+
 # monthList = [
     #                   "January", "February", "March",
     #                    "April", "May", "June",
@@ -29,8 +33,55 @@ monthDict = {
     10 : "October", 11 :"November",     12 : "December"
 }
 
-Template = 'AwardTemplate2019-2020.docx'
-SpreadSheet = 'Processed_Report1-Revised.csv'
+year = datetime.datetime.now().year
+month = datetime.datetime.now().month
+
+studentcount    = 0
+HighH           = 0
+HRolls          = 0
+HMention        = 0
+
+needInfo = False
+
+def statcounter():
+    global studentcount
+    global HighH
+    global HRolls
+    global HMention
+    global SpreadSheet
+
+    with open(SpreadSheet, encoding='utf-8-sig') as csvfile:
+        reader = csv.DictReader(csvfile)
+        for row in reader:
+            Certificate = row['Certificate']
+            studentcount = + studentcount + 1
+            if  (Certificate == "High Honor's"):
+                HighH += 1
+            elif (Certificate == "Honorable Mention"):
+                HMention += 1
+            elif (Certificate == "Honor Roll"):
+                HRolls += 1
+
+def yearCalc(yearOfGraduation):
+    global year
+    yearOfGraduation = int(yearOfGraduation)
+    yearsLeft = yearOfGraduation - year
+    match (yearsLeft):
+        case 5:
+            return 7
+        case 4:
+            return 8
+        case 3:
+            return 9
+        case 2:
+            return 10
+        case 1:
+            return 11
+        case 0:
+            return 12
+        case _:
+            print("Years left out of bounds.")
+            return -1
 
 def all_paragraphs(doc):
     for p in doc.element.body.iter(qn('w:p')):
@@ -39,22 +90,26 @@ def all_paragraphs(doc):
 
 def deTERMine(month):
     if month.isdigit():
-        if      ( int(month) == 9 or (int(month) == 10) or (int(month) == 11) or int(month) == 12 ):
+        if      ( 9 <= int(month) <= 11 ):                      #SEPT to NOV
             return 1
-        elif    ( (int(month) == 1) or (int(month) == 2) or int(month) == 3 ):
+        elif    ( 1 <= int(month) <= 2 or int(month) == 12 ):   #DEC to JAN
             return 2
-        elif    ( int(month) == 4 or (int(month) == 5) or (int(month) == 6) ):
+        elif    ( 3 <= int(month) <= 4 ):                       #MAR to APR
             return 3
-        else:
+        elif    ( 5 <= int(month) <= 6 ):                       #MAY to JUN
             return 4
+        else:
+            return -1                                           #not valid - they are off by a month for leniency
     elif isinstance(month, str):
         if month in monthDict.values():
-            if      ( month in (monthDict[9], monthDict[10], monthDict[11], monthDict[12] ) ):
+            if      ( month in (monthDict[9], monthDict[10], monthDict[11]) ):  #SEPT to NOV
                 return 1
-            elif    ( month in (monthDict[1], monthDict[2], monthDict[3] ) ):
+            elif    ( month in (monthDict[12], monthDict[1], monthDict[2] ) ):  #DEC to JAN
                 return 2
-            elif    ( month in (monthDict[4], monthDict[5], monthDict[6] ) ):
+            elif    ( month in (monthDict[3], monthDict[4] ) ):                 #MAR to APR
                 return 3
+            elif    (month in (monthDict[5], monthDict[6]) ):                   #MAY to JUN
+                return 4
             else:
                 return -1
         else :
@@ -90,9 +145,9 @@ def schoolYearCalc(year, month):
         return -1
     year = int(year)
 
-    if 9 <= month_num <= 12: # SEPT to DEC
+    if 9 <= month_num <= 12:    # SEPT to DEC
         return f"{year} - {year + 1}"
-    elif 1 <= month_num <= 8: # JAN TO AUG
+    elif 1 <= month_num <= 8:   # JAN TO AUG
         return f"{year - 1} - {year}"
     else:
         print("ERROR: MONTH IS OUT OF BOUNDS AND NOT A VALID MONTH.")
@@ -151,12 +206,13 @@ def readsheet(sheet, Month, Years):
             SFN = row['StudentFullName']
             Certificate = row['Certificate']
             LastName = SFN.split()[-1]
+            YearOfGraduation = row['Year']
             print(SFN + " - " + Certificate)
-            assign(SFN, Certificate, Month, Years, LastName)
+            assign(SFN, Certificate, Month, Years, LastName, YearOfGraduation)
     #reads the sheet for names.
     # return
 
-def assign(StudentFullName, Certificate, Month, Year, LastName):
+def assign(StudentFullName, Certificate, Month, Year, LastName, YearOfGraduation):
     # string, string, string, string, string
     doc = Document(Template)
 
@@ -179,12 +235,16 @@ def assign(StudentFullName, Certificate, Month, Year, LastName):
         for old_text, (new_text, font_name, size, bold, superscript) in replacements.items():
             replace_in_paragraph(paragraph, old_text, new_text, font_name, size, bold, superscript)
 
-    output_folder = Path(f"{month:02d}" + "-" + Years)
+
+    output_folder = Path("Grade" + f"{yearCalc(YearOfGraduation):02d}" + " - " + Years + " - " + "Term" + termNumber)
     output_folder.mkdir(parents=True, exist_ok=True)
 
     FirstName = StudentFullName.split()[0]
-    filename = (LastName + FirstName + "-" + f"{month:02d}" + "-" + Years) + ".docx"
+    filename = ("Grade" + f"{yearCalc(YearOfGraduation):02d}" + " - " + Certificate + " - " + LastName + FirstName) + ".docx"
     fullPath = output_folder / filename
+
+    # OutputFolder =
+    # StudentName = Grade + GradeNo. + CertificateType + Lastname + Firstname
 
     doc.save(fullPath)
     #writes the name into the doc
@@ -196,13 +256,13 @@ if __name__ == '__main__':
 
     # fileCheck()
 
-    # year = 2026
-    # month = 9
+    # year = 2025
+    # month = 5
     YearOfGraduation = 2030
     #manually inputted year and month
 
-    year = datetime.datetime.now().year
-    month = datetime.datetime.now().month
+    # global month
+    # global year
     #year and month grabbed from NOW
 
     SchoolYear = str(year) + " - " + str(year + 1)
@@ -215,5 +275,12 @@ if __name__ == '__main__':
 
     readsheet(SpreadSheet, monthCorrected, Years)
     # fileCheck()
+
+    if needInfo:
+        statcounter()
+        print(f"Number of Students: {studentcount}")
+        print(f"Number of High Honors {HighH}")
+        print(f"Number of Honor Rolls {HRolls}")
+        print(f"Number of Honorable Mentions: {HMention}")
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
