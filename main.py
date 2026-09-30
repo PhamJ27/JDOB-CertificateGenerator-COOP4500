@@ -12,7 +12,9 @@ from pathlib import Path
 from docx.shared import Pt
 
 from docx.text.paragraph import Paragraph
+from docxcompose.composer import Composer
 from docx.oxml.ns import qn
+from docx2pdf import convert
 import time
 
 
@@ -61,6 +63,7 @@ def statcounter():
                 HMention += 1
             elif (Certificate == "Honor Roll"):
                 HRolls += 1
+    #read the spreadsheet, read each row. count each student. then count each of the Certificate type.
 
 def yearCalc(yearOfGraduation):
     global year
@@ -82,6 +85,8 @@ def yearCalc(yearOfGraduation):
         case _:
             print("Years left out of bounds.")
             return -1
+    #calculate the grade using year of graduation and the year.
+    # year is calculated previously as the current year, but can be changed
 
 def all_paragraphs(doc):
     for p in doc.element.body.iter(qn('w:p')):
@@ -89,7 +94,7 @@ def all_paragraphs(doc):
     # gives all the paragraphs within a doc, pausing and sending after every one
 
 def deTERMine(month):
-    if month.isdigit():
+    if isinstance(month, int):
         if      ( 9 <= int(month) <= 11 ):                      #SEPT to NOV
             return 1
         elif    ( 1 <= int(month) <= 2 or int(month) == 12 ):   #DEC to JAN
@@ -134,7 +139,7 @@ def deTERMineSUFFIX(month):
 
 
 def schoolYearCalc(year, month):
-    if month.isdigit() and month.isdigit():
+    if month.isdigit():
         month_num = int(month)
     elif isinstance(month, int):
         month_num = month
@@ -144,7 +149,6 @@ def schoolYearCalc(year, month):
         print("ERROR: MONTH IS OUT OF BOUNDS AND NOT A VALID MONTH.")
         return -1
     year = int(year)
-
     if 9 <= month_num <= 12:    # SEPT to DEC
         return f"{year} - {year + 1}"
     elif 1 <= month_num <= 8:   # JAN TO AUG
@@ -152,6 +156,9 @@ def schoolYearCalc(year, month):
     else:
         print("ERROR: MONTH IS OUT OF BOUNDS AND NOT A VALID MONTH.")
         return -1
+    # taking in the month as any data type, the current year range is based on the month you're in
+    # from SEPT to DEC, the schoolyear is current & current + 1
+    # from JAN to AUG to school year is current - 1 & current
 
 def replace_in_paragraph(paragraph, old, new, font_name, size, bold, superscript):
     while True:
@@ -248,17 +255,61 @@ def assign(StudentFullName, Certificate, Month, Year, LastName, YearOfGraduation
 
     doc.save(fullPath)
     #writes the name into the doc
-    return
+
+    # return doc
+    # returns the newly created document
 
 
-# Press the green button in the gutter to run the script.
+# THE NEXT FUNCTIONS ARE MERGED VERSIONS OF THE PREVIOUS ONES. THEY WORK IN TANDEM TO CREATE ONE SINGLE FILE.
+
+def readsheetmerge(sheet, Month, Years):
+    docs = []
+    with open(sheet, encoding='utf-8-sig') as csvfile:
+        reader = csv.DictReader(csvfile)
+        for row in reader:
+            SFN = row['StudentFullName']
+            Certificate = row['Certificate']
+            LastName = SFN.split()[-1]
+            YearOfGraduation = row['Year']
+            print(SFN + " - " + Certificate)
+            student_doc = assignMerge(SFN, Certificate, Month, Years, LastName, YearOfGraduation)
+            docs.append(student_doc)
+    return docs
+    #reads the sheet for names.
+    # return
+
+def assignMerge(StudentFullName, Certificate, Month, Year, LastName, YearOfGraduation):
+    # string, string, string, string, string
+    doc = Document(Template)
+
+    termNumber  = str(deTERMine(Month))
+    Suffix      = deTERMineSUFFIX(Month)
+    SchoolYear  = schoolYearCalc(Year, Month)
+
+    # toReplace             Replacement, Font, Size, Boldness, Superscript
+    replacements = {
+        "{{FULLNAME}}":     (StudentFullName,   "Monotype Corsiva", 47, True, False),
+        "{{CERTIFICATE}}":  (Certificate,       "Monotype Corsiva", 47, True, False),
+        "{{MONTH}}":        (Month,             "Monotype Corsiva", 22, True, False),
+        "{{YEAR}}":         (Year,              "Monotype Corsiva", 22, True, False),
+        "{{TERMNO}}":       (termNumber,        "Monotype Corsiva", 18, False, False),
+        "{{SUFFIX}}":       (Suffix,            "Monotype Corsiva", 18, False, True),
+        "{{SCHOOLYEAR}}":   (SchoolYear,        "Monotype Corsiva", 18, False, False)
+    }
+
+    for paragraph in all_paragraphs(doc):
+        for old_text, (new_text, font_name, size, bold, superscript) in replacements.items():
+            replace_in_paragraph(paragraph, old_text, new_text, font_name, size, bold, superscript)
+    return doc
+    # returns the newly created document
+
 if __name__ == '__main__':
 
     # fileCheck()
 
     # year = 2025
     # month = 5
-    YearOfGraduation = 2030
+    # YearOfGraduation = 2030
     #manually inputted year and month
 
     # global month
@@ -273,9 +324,31 @@ if __name__ == '__main__':
     # print(Years)
     # print(monthCorrected)
 
-    readsheet(SpreadSheet, monthCorrected, Years)
+    # readsheet(SpreadSheet, monthCorrected, Years)
     # fileCheck()
 
+    all_docs = readsheetmerge(SpreadSheet, monthCorrected, Years)
+
+    if all_docs:
+        master = Composer(all_docs[0])
+        for doc in all_docs[1:]:
+            master.doc.add_page_break()  # ensure each student starts on a new page
+            master.append(doc)
+        with open(SpreadSheet, encoding='utf-8-sig') as csvfile:
+            reader = csv.DictReader(csvfile)
+            first_row = next(reader)
+            YearOfGraduation = first_row['Year']    #just grab the first row's year
+        termNumber = str(deTERMine(month))
+
+        output_folder = Path("output")
+        output_folder.mkdir(parents=True, exist_ok=True)
+
+        filename = ("Grade" + f"{yearCalc(YearOfGraduation):02d}" + " - " + Years + " - " + "Term" + termNumber)
+        master.save(output_folder / (filename + ".docx"))
+        convert((output_folder / (filename + ".docx") ), (output_folder / (filename + ".pdf")  ))
+    # merged version
+
+    print("Certificates printed from: " + SpreadSheet + "are complete. They are stored in the output folder.")
     if needInfo:
         statcounter()
         print(f"Number of Students: {studentcount}")
