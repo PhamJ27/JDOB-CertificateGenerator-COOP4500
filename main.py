@@ -136,6 +136,8 @@ def deTERMineSUFFIX(month):
             print("ERROR: ")
         else:   # or (int(month) == 5) or (int(month) == 6) #tbh works with everything else
             return "th"
+    else:
+        print("ERROR: NOT A MONTH TO APPLY SUFFIX")
 
 
 def schoolYearCalc(year, month):
@@ -188,16 +190,12 @@ def replace_in_paragraph(paragraph, old, new, font_name, size, bold, superscript
                 placed = True
             else:
                 run.text = run.text[:s] + run.text[e:]
-#given a paragraph, as long it's true (so replace all placeholders).
-#given a list of bodies of text, join all of them to full.
-#the start is when the placeholder is first found.
-#the end is start + length of the placeholder. (so the whole placeholder)
-# for every body of text, if a placeholder is directly before or after, ignore it.
-#otherwise if the body of text overlaps,
-# the start is start or run_start (whichever is bigger) - run_start
-# and our end is end or run_end (whichever is smaller) - run_start
-
-#if it hasn't been placed, replace it and mark it
+# paragraphs are made of runs
+# a run is continuous piece of text with the same format
+#  use the full text to find the start. the end is end of old
+#  for every run its start and end is 0 and end of the run's text.
+# replace that bulk, then mark it as true.
+# now the run = rest of the start - bulk - rest of the end
 
 
 def fileCheck():
@@ -216,8 +214,11 @@ def readsheet(sheet, Month, Years):
             YearOfGraduation = row['Year']
             print(SFN + " - " + Certificate)
             assign(SFN, Certificate, Month, Years, LastName, YearOfGraduation)
-    #reads the sheet for names.
-    # return
+    # reads the sheet for names.
+    # open the file, read it.
+    # for every row, extract the full name, certificate, last name, and Year of Graduation.
+    # print the current student.
+    # then assign it.
 
 def assign(StudentFullName, Certificate, Month, Year, LastName, YearOfGraduation):
     # string, string, string, string, string
@@ -227,7 +228,7 @@ def assign(StudentFullName, Certificate, Month, Year, LastName, YearOfGraduation
     Suffix      = deTERMineSUFFIX(Month)
     SchoolYear  = schoolYearCalc(Year, Month)
 
-    # toReplace             Replacement, Font, Size, Boldness, Superscript
+    # old_text             Replacement, Font, Size, Boldness, Superscript
     replacements = {
         "{{FULLNAME}}":     (StudentFullName,   "Monotype Corsiva", 47, True, False),
         "{{CERTIFICATE}}":  (Certificate,       "Monotype Corsiva", 47, True, False),
@@ -242,15 +243,18 @@ def assign(StudentFullName, Certificate, Month, Year, LastName, YearOfGraduation
         for old_text, (new_text, font_name, size, bold, superscript) in replacements.items():
             replace_in_paragraph(paragraph, old_text, new_text, font_name, size, bold, superscript)
 
+    # for every paragraph and
+    # for every old piece of text and element to replace in the replacement list (shown as replaced, (replacement, items)
+    # replace it, using the text, font, size, boldness, and superscript.
 
     output_folder = Path("Grade" + f"{yearCalc(YearOfGraduation):02d}" + " - " + Years + " - " + "Term" + termNumber)
-    output_folder.mkdir(parents=True, exist_ok=True)
+    output_folder.mkdir(parents=True, exist_ok=True)    #creates parents and does nothing if it already exists.
 
     FirstName = StudentFullName.split()[0]
     filename = ("Grade" + f"{yearCalc(YearOfGraduation):02d}" + " - " + Certificate + " - " + LastName + FirstName) + ".docx"
     fullPath = output_folder / filename
 
-    # OutputFolder =
+    # OutputFolder = RelativePathToProgram / Grade - GradeNumber - YearRange - Term - TermNumber
     # StudentName = Grade + GradeNo. + CertificateType + Lastname + Firstname
 
     doc.save(fullPath)
@@ -275,7 +279,7 @@ def readsheetmerge(sheet, Month, Years):
             student_doc = assignMerge(SFN, Certificate, Month, Years, LastName, YearOfGraduation)
             docs.append(student_doc)
     return docs
-    #reads the sheet for names.
+    #reads the sheet for names. read readsheetmerge() for the rest of the comments
     # return
 
 def assignMerge(StudentFullName, Certificate, Month, Year, LastName, YearOfGraduation):
@@ -301,7 +305,7 @@ def assignMerge(StudentFullName, Certificate, Month, Year, LastName, YearOfGradu
         for old_text, (new_text, font_name, size, bold, superscript) in replacements.items():
             replace_in_paragraph(paragraph, old_text, new_text, font_name, size, bold, superscript)
     return doc
-    # returns the newly created document
+    # returns the newly created document, read assign() for the rest of the comments
 
 if __name__ == '__main__':
 
@@ -344,8 +348,13 @@ if __name__ == '__main__':
         output_folder.mkdir(parents=True, exist_ok=True)
 
         filename = ("Grade" + f"{yearCalc(YearOfGraduation):02d}" + " - " + Years + " - " + "Term" + termNumber)
+        # Grade - GradeLevels( 08, 09, 10, 11, 12) - Year Range - Term - TermNumber (1, 2, 3, 4)
         master.save(output_folder / (filename + ".docx"))
         convert((output_folder / (filename + ".docx") ), (output_folder / (filename + ".pdf")  ))
+    # until it's done reading all_docs
+    # there's a list of docs called masterdocs using composer - (from docxcompose)
+    # this doc skips to the 2nd student, adds a page break, then appends the doc.
+    # the rest is naming, saving, and converting the file.
     # merged version
 
     print("Certificates printed from: " + SpreadSheet + "are complete. They are stored in the output folder.")
