@@ -200,8 +200,15 @@ def replace_in_paragraph(paragraph, old, new, font_name, size, bold, superscript
 
 def fileCheck():
     print(os.getcwd())
-    print(os.path.exists(SpreadSheet))
-    print(os.path.exists(Template))
+    if ( (os.path.exists(SpreadSheet) and SpreadSheet.endswith('.csv')) and (os.path.exists(Template) and Template.endswith('.docx'))):
+        print("Both the spreadsheet filepaths are valid")
+    elif (os.path.exists(SpreadSheet) and SpreadSheet.endswith('.csv')) and (not(os.path.exists(Template)) or not(Template.endswith('.docx'))):
+        print("Spreadsheet filepath is valid, but not the template.")
+    elif (not(os.path.exists(SpreadSheet)) or not(SpreadSheet.endswith('.csv'))) and (os.path.exists(Template) and Template.endswith('.docx')):
+        print("Template filepath is valid, but not the spreadsheet.")
+    else:
+        print("Neither spreadsheet filepath or template are valid!")
+    #check if they exist and they're the correct file format. if it's messy, it's because it's easier for me to read
 
 
 def readsheet(sheet, Month, Years):
@@ -307,6 +314,35 @@ def assignMerge(StudentFullName, Certificate, Month, Year, LastName, YearOfGradu
     return doc
     # returns the newly created document, read assign() for the rest of the comments
 
+def createCertificates(spreadsheet, month, year):
+    all_docs = readsheetmerge(spreadsheet, month, year)
+
+    if all_docs:
+        master = Composer(all_docs[0])
+        for doc in all_docs[1:]:
+            master.doc.add_page_break()  # ensure each student starts on a new page
+            master.append(doc)
+        with open(SpreadSheet, encoding='utf-8-sig') as csvfile:
+            reader = csv.DictReader(csvfile)
+            first_row = next(reader)
+            YearOfGraduation = first_row['Year']  # just grab the first row's year
+        termNumber = str(deTERMine(month))
+
+        output_folder = Path("output")
+        output_folder.mkdir(parents=True, exist_ok=True)
+
+        filename = ("Grade" + f"{yearCalc(YearOfGraduation):02d}" + " - " + Years + " - " + "Term" + termNumber)
+        # Grade - GradeLevels( 08, 09, 10, 11, 12) - Year Range - Term - TermNumber (1, 2, 3, 4)
+        master.save(output_folder / (filename + ".docx"))
+        convert((output_folder / (filename + ".docx")), (output_folder / (filename + ".pdf")))
+    # until it's done reading all_docs
+    # there's a list of docs called masterdocs using composer - (from docxcompose)
+    # this doc skips to the 2nd student, adds a page break, then appends the doc.
+    # the rest is naming, saving, and converting the file.
+    # merged version
+
+    print("Certificates printed from: " + SpreadSheet + " are complete. They are stored in the output folder.")
+
 if __name__ == '__main__':
 
     # fileCheck()
@@ -329,35 +365,9 @@ if __name__ == '__main__':
     # print(monthCorrected)
 
     # readsheet(SpreadSheet, monthCorrected, Years)
-    # fileCheck()
+    fileCheck()
 
-    all_docs = readsheetmerge(SpreadSheet, monthCorrected, Years)
-
-    if all_docs:
-        master = Composer(all_docs[0])
-        for doc in all_docs[1:]:
-            master.doc.add_page_break()  # ensure each student starts on a new page
-            master.append(doc)
-        with open(SpreadSheet, encoding='utf-8-sig') as csvfile:
-            reader = csv.DictReader(csvfile)
-            first_row = next(reader)
-            YearOfGraduation = first_row['Year']    #just grab the first row's year
-        termNumber = str(deTERMine(month))
-
-        output_folder = Path("output")
-        output_folder.mkdir(parents=True, exist_ok=True)
-
-        filename = ("Grade" + f"{yearCalc(YearOfGraduation):02d}" + " - " + Years + " - " + "Term" + termNumber)
-        # Grade - GradeLevels( 08, 09, 10, 11, 12) - Year Range - Term - TermNumber (1, 2, 3, 4)
-        master.save(output_folder / (filename + ".docx"))
-        convert((output_folder / (filename + ".docx") ), (output_folder / (filename + ".pdf")  ))
-    # until it's done reading all_docs
-    # there's a list of docs called masterdocs using composer - (from docxcompose)
-    # this doc skips to the 2nd student, adds a page break, then appends the doc.
-    # the rest is naming, saving, and converting the file.
-    # merged version
-
-    print("Certificates printed from: " + SpreadSheet + "are complete. They are stored in the output folder.")
+    # createCertificates(SpreadSheet, monthCorrected, Years)
     if needInfo:
         statcounter()
         print(f"Number of Students: {studentcount}")
