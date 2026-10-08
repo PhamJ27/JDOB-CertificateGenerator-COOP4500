@@ -1,7 +1,7 @@
 <h1> This is the John D' O Bryant Certificate/Awards Generator  </h1>
 <br>
 
-    <!---    Explanation and Purpose     --->
+<!---    Explanation and Purpose     --->
 <p>
     This project creates awards for each student based on a spreadsheet containing all the students and their designated certificate for the term. 
     The term is calculated based on the current time of generation and create a folder in the <strong>"output"</strong> folder.
@@ -22,7 +22,7 @@
 </p>
 <br>
 
-    <!---    Requirements   --->
+<!---    Requirements   --->
 <p>
     This was programmed in Python 3.11.9 and in PyCharm Community Edition 2024.2.2.
     Although the requirements may be lower and regardless of IDE.
@@ -50,24 +50,28 @@
 </ul>
 <br>
 
-    <!---     How it Works    --->
-<p>
-    The program also has some statistical functions such as: statcounter() and fileCheck().
-    statcounter() counts all students and counts for each award type:
-</p>
-<ul>
-    <li> High Honors </li>
-    <li> Honor Rolls </li>
-    <li> Honorable Mention </li>
-</ul>
-<p>
-    The assign() function replaces the instance of placeholder text with the replacement text and appropriate formatting. 
-    Examples of placeholder text being {{FULLNAME}}", "{{CERTIFICATE}}", "{{MONTH}}", "{{YEAR}}", etc.
+<!---     How it Works    --->
 
-    The readsheet function opens the sheet and passes each row and year/month into the assign function.
+<p>Example: </p>
 
-    The merged versions of these functions are modified work in tandem with each other to create a singular docx file.
+|    StudentFullName | Year | Certificate       |
+|-------------------:|------|-------------------|
+|        Jotaro Kujo | 1987 | Honorable Mention |
+|   Noriyaki Kakyoin | 1987 | Honor Roll        |
+| Josuke Higashikata | 2001 | Honor Roll        |
+|           John Rod | 2026 | High Honors       |
 
-    
-</p>
+> statcounter() counts all students and counts for each award type: High Honors, Honor Roll, and Honorable Mention.
+
+> The assign() function replaces the instance of placeholder text with the replacement text and appropriate formatting. 
+> Examples of placeholder text being {{FULLNAME}}", "{{CERTIFICATE}}", "{{MONTH}}", "{{YEAR}}", etc.
+
+> The readsheet function opens the sheet and passes each row and year/month into the assign function.
+
+> The merged versions of these functions are modified work in tandem with each other to create a singular docx file.
+
+> filecheck() - prints the current working directory + checks if the spreadsheet and template are available and valid.
+
+<p></p>
+
 <p></p>
