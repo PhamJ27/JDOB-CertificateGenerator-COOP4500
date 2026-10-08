@@ -1,7 +1,7 @@
 <h1> This is the John D' O Bryant Certificate/Awards Generator  </h1>
 <br>
 
-    <!--    Explanation and Purpose     -->
+    <!---    Explanation and Purpose     --->
 <p>
     This project creates awards for each student based on a spreadsheet containing all the students and their designated certificate for the term. 
     The term is calculated based on the current time of generation and create a folder in the <strong>"output"</strong> folder.
@@ -22,7 +22,7 @@
 </p>
 <br>
 
-    <!--    Requirements   -->
+    <!---    Requirements   --->
 <p>
     This was programmed in Python 3.11.9 and in PyCharm Community Edition 2024.2.2.
     Although the requirements may be lower and regardless of IDE.
@@ -50,7 +50,7 @@
 </ul>
 <br>
 
-    <!--     How it Works    -->
+    <!---     How it Works    --->
 <p>
     The program also has some statistical functions such as: statcounter() and fileCheck().
     statcounter() counts all students and counts for each award type:
