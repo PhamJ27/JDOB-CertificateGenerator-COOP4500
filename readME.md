@@ -1,7 +1,7 @@
 <h1> This is the John D' O Bryant Certificate/Awards Generator  </h1>
 <br>
 
-<!---    Explanation and Purpose     --->
+<!--    Explanation and Purpose     -->
 <p>
     This project creates awards for each student based on a spreadsheet containing all the students and their designated certificate for the term. 
     The term is calculated based on the current time of generation and create a folder in the <strong>"output"</strong> folder.
@@ -32,7 +32,7 @@
         <li>python-docx</li>
         <li>docxcompose</li>
         <li>docx2pdf</li>
-</ul>
+    </ul>
 <p> It also uses some built-in modules such as: </p>
 <ul>
     <li>csv</li>
@@ -40,7 +40,8 @@
     <li>os</li>
     <li>pathlib</li>
 </ul>
-    <!--    Required Files   -->
+
+<!--    Required Files   -->
 <p> The template MUST come in a form of a docx file, a sample is provided.  </p>
 <p> The columns must be labelled as the above. The columns mean:            </p>
 <ul>
@@ -48,7 +49,6 @@
     <li>Year - Year Of Graduation. Listed as a four digit number such as: 1999, 2005, 2067.</li>
     <li>Certificate - The specific award the student is granted. Example: High Honors, Honor Rolls, and  Honorable Mention.</li>
 </ul>
-<br>
 
 <!---     How it Works    --->
 
@@ -61,16 +61,32 @@
 | Josuke Higashikata | 2001 | Honor Roll        |
 |           John Rod | 2026 | High Honors       |
 
-> statcounter() counts all students and counts for each award type: High Honors, Honor Roll, and Honorable Mention.
+<br>
 
-> The assign() function replaces the instance of placeholder text with the replacement text and appropriate formatting. 
+> The assign() - replaces the instance of placeholder text with the replacement text and appropriate formatting. 
 > Examples of placeholder text being {{FULLNAME}}", "{{CERTIFICATE}}", "{{MONTH}}", "{{YEAR}}", etc.
 
-> The readsheet function opens the sheet and passes each row and year/month into the assign function.
+> The readsheet() - opens the sheet and passes each row and year/month into the assign function.
 
 > The merged versions of these functions are modified work in tandem with each other to create a singular docx file.
 
 > filecheck() - prints the current working directory + checks if the spreadsheet and template are available and valid.
+
+> yearCalc() - calculates the current grade level for the student based on Year of Graduation
+
+> deTERMine() - determines the term based on given month.
+
+> deTERMineSUFFIX() - determines the 1st, 2nd, 3rd, and 4th suffixes based on term.
+
+> SchoolYearCalc() - calculates the school year range based on month.
+
+> statcounter() - counts all students and counts for each award type: High Honors, Honor Roll, and Honorable Mention.
+
+> all_paragraphs() - grabs the paragraphs in the document
+
+> createCertificates - creates the certificate using a spreadsheet and given month and year.
+
+<p> The main methods to create the pdf is createCertificates. </p>
 
 <p></p>
 
