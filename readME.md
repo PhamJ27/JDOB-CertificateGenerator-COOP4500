@@ -88,6 +88,13 @@
 
 <p> The main methods to create the pdf is createCertificates. </p>
 
-<p></p>
+<h2> Example Spreadsheet: </h2>
+<img src=".\readMEAsset\SheetExample.png">
+
+<h2> Example Template: </h2>
+<img src=".\readMEAsset\HPTemplatePreview.png">
+
+<h2> Example Final Product: </h2>
+<img src=".\readMEAsset\MakotoNaegiExample.png">
 
 <p></p>

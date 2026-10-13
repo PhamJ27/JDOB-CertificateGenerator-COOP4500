@@ -18,8 +18,11 @@ from docx2pdf import convert
 import time
 
 
-Template    = 'AwardTemplate2019-2020.docx'
-SpreadSheet = 'Processed_Report1-Revised.csv'
+Template    = '.\GithubExamples\HP-AwardTemplate2019-2020.docx'
+SpreadSheet = '.\GithubExamples\DanganronpaExampleSpreadsheet.csv'
+
+#if you're doing a folder, the relative paths require .\ and the rest of the paths can be copied with "Ctrl + Shift + C".
+# be sure to remove the quotation marks before putting it in.
 
 # monthList = [
     #                   "January", "February", "March",
@@ -347,16 +350,11 @@ if __name__ == '__main__':
 
     # fileCheck()
 
-    # year = 2025
+    # year = 2009
     # month = 5
     # YearOfGraduation = 2030
     #manually inputted year and month
 
-    # global month
-    # global year
-    #year and month grabbed from NOW
-
-    SchoolYear = str(year) + " - " + str(year + 1)
     Years = str(year)
     # monthCorrected = monthList[month]
     monthCorrected = monthDict.get(month)       #retrieve
@@ -365,9 +363,9 @@ if __name__ == '__main__':
     # print(monthCorrected)
 
     # readsheet(SpreadSheet, monthCorrected, Years)
-    fileCheck()
+    # fileCheck()
 
-    # createCertificates(SpreadSheet, monthCorrected, Years)
+    createCertificates(SpreadSheet, monthCorrected, Years)
     if needInfo:
         statcounter()
         print(f"Number of Students: {studentcount}")
