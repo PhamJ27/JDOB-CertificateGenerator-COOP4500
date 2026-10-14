@@ -1,5 +1,6 @@
 # This is a sample Python script.
 import datetime
+import sys
 # Press Shift+F10 to execute it or replace it with your code.
 # Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
 
@@ -18,8 +19,13 @@ from docx2pdf import convert
 import time
 
 
-Template    = '.\GithubExamples\HP-AwardTemplate2019-2020.docx'
-SpreadSheet = '.\GithubExamples\DanganronpaExampleSpreadsheet.csv'
+# Template    = '.\GithubExamples\HP-AwardTemplate20XX-20XX.docx'
+# SpreadSheet = '.\GithubExamples\DanganronpaExampleSpreadsheet.csv'
+# example template and sheet
+
+Template    = '.\input\AwardTemplate20XX-20XX-ForCG.docx'
+SpreadSheet = '.\input\Processed_Report1-Revised.csv'
+#real sheets
 
 #if you're doing a folder, the relative paths require .\ and the rest of the paths can be copied with "Ctrl + Shift + C".
 # be sure to remove the quotation marks before putting it in.
@@ -203,6 +209,7 @@ def replace_in_paragraph(paragraph, old, new, font_name, size, bold, superscript
 
 def fileCheck():
     print(os.getcwd())
+
     if ( (os.path.exists(SpreadSheet) and SpreadSheet.endswith('.csv')) and (os.path.exists(Template) and Template.endswith('.docx'))):
         print("Both the spreadsheet filepaths are valid")
     elif (os.path.exists(SpreadSheet) and SpreadSheet.endswith('.csv')) and (not(os.path.exists(Template)) or not(Template.endswith('.docx'))):
@@ -213,6 +220,23 @@ def fileCheck():
         print("Neither spreadsheet filepath or template are valid!")
     #check if they exist and they're the correct file format. if it's messy, it's because it's easier for me to read
 
+
+    # if (sys.argv[1] and sys.argv[2]):
+    #     if( (sys.argv[1].endswith('.csv')) and (sys.argv[2].endswith('.docx')) ):
+    #         SpreadSheet = sys.argv[1]
+    #         Template = sys.argv[2]
+    #     elif( (sys.argv[1].endswith('.docx')) and (sys.argv[2].endswith('.csv')) ):
+    #         Template = sys.argv[1]
+    #         SpreadSheet = sys.argv[2]
+    #     elif( (sys.argv[1].endswith('.docx')) or (not(sys.argv[2].endswith('.csv')) or sys.argv[2]==None) ):
+    #         print("The spreadsheet file is not a csv!")
+    #     elif( (not(sys.argv[1].endswith('.csv')) or sys.argv[1]==None) or (sys.argv[2].endswith('.csv')) ):
+    #         print("The spreadsheet file is not a docx!")
+    #     else:
+    #         print("Neither spreadsheet filepath or template are valid or missing!")
+    #
+    #   supposed to be a drag and drop feature that comes after the print statement.
+    #   i can't drag them for some reason so the logic will stay commented here
 
 def readsheet(sheet, Month, Years):
     with open(sheet, encoding='utf-8-sig') as csvfile:
@@ -362,8 +386,7 @@ if __name__ == '__main__':
     # print(Years)
     # print(monthCorrected)
 
-    # readsheet(SpreadSheet, monthCorrected, Years)
-    # fileCheck()
+    fileCheck()
 
     createCertificates(SpreadSheet, monthCorrected, Years)
     if needInfo:

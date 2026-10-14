@@ -96,5 +96,3 @@
 
 <h2> Example Final Product: </h2>
 <img src=".\readMEAsset\MakotoNaegiExample.png">
-
-<p></p>
