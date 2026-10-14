@@ -64,7 +64,7 @@
 <br>
 
 > The assign() - replaces the instance of placeholder text with the replacement text and appropriate formatting. 
-> Examples of placeholder text being {{FULLNAME}}", "{{CERTIFICATE}}", "{{MONTH}}", "{{YEAR}}", etc.
+> Examples of placeholder text being "{{FULLNAME}}", "{{CERTIFICATE}}", "{{MONTH}}", "{{YEAR}}", etc.
 
 > The readsheet() - opens the sheet and passes each row and year/month into the assign function.
 
@@ -87,6 +87,8 @@
 > createCertificates - creates the certificate using a spreadsheet and given month and year.
 
 <p> The main methods to create the pdf is createCertificates. </p>
+
+<h1>PLEASE DO NOTE IF YOU UE THE CODE WITHOUT MODIFICATION IT WILL USE THE CURRENT MONTH AND YEAR TO CALCULATE YEAR RANGE, GRADE LEVEL, ETC.</h1>
 
 <h2> Example Spreadsheet: </h2>
 <img src=".\readMEAsset\SheetExample.png">
